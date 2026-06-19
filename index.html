@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MB Transport – Umzüge, Pakete & Abschlepp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ───────────────────────────────────────────── */
+    :root {
+      --ink:     #0D1B2A;
+      --accent:  #F5A623;
+      --accent2: #E09010;
+      --mid:     #2C3E50;
+      --light:   #F4F6F9;
+      --muted:   #6B7A8D;
+      --white:   #FFFFFF;
+      --card1:   #1A3A5C;
+      --card2:   #1C3D2E;
+      --card3:   #3D1A1A;
+      --radius:  12px;
+      --shadow:  0 4px 24px rgba(13,27,42,.15);
+      --transition: .25s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── RESET ────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--white);
+      color: var(--mid);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+
+    /* ── UTILITY ──────────────────────────────────────────── */
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── NAV ──────────────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--ink);
+      border-bottom: 3px solid var(--accent);
+    }
+    .nav__inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .nav__logo {
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+    }
+    .nav__logo-badge {
+      background: var(--accent);
+      color: var(--ink);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: .5px;
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+    .nav__logo-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: .5px;
+    }
+    .nav__links {
+      display: flex; align-items: center; gap: 4px;
+    }
+    .nav__link {
+      color: rgba(255,255,255,.75);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+    .nav__link:hover, .nav__link.active {
+      color: var(--accent);
+      background: rgba(245,166,35,.08);
+    }
+    .nav__cta {
+      background: var(--accent);
+      color: var(--ink) !important;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 9px 18px !important;
+    }
+    .nav__cta:hover { background: var(--accent2); }
+    .nav__hamburger {
+      display: none; flex-direction: column; gap: 5px; cursor: pointer;
+      background: none; border: none; padding: 8px;
+    }
+    .nav__hamburger span {
+      width: 24px; height: 2px; background: var(--white); border-radius: 2px;
+      transition: var(--transition);
+    }
+    .nav__mobile {
+      display: none; flex-direction: column;
+      background: var(--ink); padding: 12px 24px 20px;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .nav__mobile.open { display: flex; }
+    .nav__mobile .nav__link { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+
+    /* ── HERO ─────────────────────────────────────────────── */
+    .hero {
+      background: var(--ink);
+      padding: 80px 0 100px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -1px; left: 0; right: 0; height: 60px;
+      background: var(--light);
+      clip-path: polygon(0 100%, 100% 100%, 100% 30%, 0 100%);
+    }
+    .hero__road {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 8px;
+      background: repeating-linear-gradient(90deg, var(--accent) 0, var(--accent) 40px, transparent 40px, transparent 80px);
+      opacity: .25;
+    }
+    .hero__inner {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .hero__eyebrow {
+      font-size: 11px; font-weight: 600; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .hero__headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(44px, 5vw, 68px);
+      font-weight: 800;
+      line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 20px;
+    }
+    .hero__headline span { color: var(--accent); }
+    .hero__sub {
+      font-size: 17px; font-weight: 300;
+      color: rgba(255,255,255,.7);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+    .hero__actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px; font-weight: 600;
+      padding: 14px 28px; border-radius: 8px;
+      border: none; cursor: pointer;
+      transition: var(--transition);
+      line-height: 1;
+    }
+    .btn-primary {
+      background: var(--accent); color: var(--ink);
+    }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-ghost {
+      background: transparent; color: var(--white);
+      border: 1.5px solid rgba(255,255,255,.3);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .hero__stats {
+      display: flex; gap: 32px; margin-top: 48px;
+    }
+    .hero__stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 38px; font-weight: 800; color: var(--accent);
+      line-height: 1;
+    }
+    .hero__stat-label {
+      font-size: 12px; color: rgba(255,255,255,.5);
+      margin-top: 4px;
+    }
+    .hero__visual {
+      display: flex; flex-direction: column; gap: 16px; align-items: flex-end;
+    }
+    .hero__truck-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius);
+      padding: 20px 28px;
+      width: 100%;
+      backdrop-filter: blur(8px);
+    }
+    .hero__truck-icon { font-size: 48px; margin-bottom: 10px; }
+    .hero__truck-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 700; color: var(--white);
+    }
+    .hero__truck-desc { font-size: 13px; color: rgba(255,255,255,.5); margin-top: 4px; }
+    .hero__phone-bar {
+      background: var(--accent);
+      border-radius: var(--radius);
+      padding: 14px 28px;
+      width: 100%;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .hero__phone-icon { font-size: 22px; }
+    .hero__phone-label { font-size: 11px; font-weight: 600; color: var(--ink); text-transform: uppercase; letter-spacing: 1px; }
+    .hero__phone-num { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; color: var(--ink); }
+
+    /* ── SERVICE TILES ────────────────────────────────────── */
+    .tiles-section {
+      background: var(--light);
+      padding: 80px 0 90px;
+    }
+    .section-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      font-size: 16px; color: var(--muted); max-width: 520px; margin-bottom: 52px;
+    }
+    .tiles-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .tile {
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      display: flex; flex-direction: column;
+    }
+    .tile:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(13,27,42,.22); }
+    .tile__top {
+      padding: 36px 32px 0;
+      position: relative;
+    }
+    .tile--move .tile__top  { background: var(--card1); }
+    .tile--parcel .tile__top { background: var(--card2); }
+    .tile--tow .tile__top   { background: var(--card3); }
+    .tile__icon {
+      font-size: 52px; line-height: 1; margin-bottom: 20px;
+    }
+    .tile__tag {
+      display: inline-block;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: rgba(245,166,35,.18);
+      color: var(--accent);
+      padding: 4px 10px; border-radius: 4px;
+      margin-bottom: 14px;
+    }
+    .tile__title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px; font-weight: 800;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .tile__desc {
+      font-size: 13.5px; color: rgba(255,255,255,.65);
+      line-height: 1.65;
+      padding-bottom: 32px;
+    }
+    /* diagonal clip between top and bottom */
+    .tile__clip {
+      height: 40px;
+      position: relative;
+    }
+    .tile--move .tile__clip  { background: var(--card1); }
+    .tile--parcel .tile__clip { background: var(--card2); }
+    .tile--tow .tile__clip   { background: var(--card3); }
+    .tile__clip::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; top: 0;
+      background: var(--white);
+      clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 0);
+    }
+    .tile__bottom {
+      background: var(--white);
+      padding: 0 32px 32px;
+      flex: 1; display: flex; flex-direction: column;
+    }
+    .tile__list {
+      margin-bottom: 24px; flex: 1;
+    }
+    .tile__list li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: var(--mid);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--light);
+    }
+    .tile__list li::before {
+      content: '✓';
+      font-weight: 700; font-size: 12px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .tile__btn {
+      display: block; width: 100%;
+      text-align: center;
+      background: var(--ink); color: var(--white);
+      font-size: 14px; font-weight: 600;
+      padding: 14px;
+      border-radius: 8px;
+      border: none; cursor: pointer;
+      transition: var(--transition);
+    }
+    .tile__btn:hover { background: var(--accent); color: var(--ink); }
+
+    /* ── TRUST STRIP ──────────────────────────────────────── */
+    .trust-strip {
+      background: var(--ink);
+      padding: 40px 0;
+    }
+    .trust-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    }
+    .trust-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px;
+      border-left: 3px solid var(--accent);
+    }
+    .trust-item__icon { font-size: 30px; }
+    .trust-item__text strong {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px; font-weight: 700; color: var(--white);
+      line-height: 1;
+    }
+    .trust-item__text span {
+      font-size: 12px; color: rgba(255,255,255,.5);
+    }
+
+    /* ── HOW IT WORKS ─────────────────────────────────────── */
+    .how-section { padding: 80px 0; background: var(--white); }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 52px;
+    }
+    .step {
+      text-align: center; padding: 40px 28px;
+      border-radius: var(--radius);
+      background: var(--light);
+      position: relative;
+    }
+    .step__num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 72px; font-weight: 800;
+      color: rgba(13,27,42,.07);
+      line-height: 1; margin-bottom: -16px;
+    }
+    .step__icon { font-size: 40px; margin-bottom: 16px; }
+    .step__title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 700; color: var(--ink);
+      margin-bottom: 10px;
+    }
+    .step__desc { font-size: 14px; color: var(--muted); line-height: 1.65; }
+    .step::after {
+      content: '→';
+      position: absolute; right: -20px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 22px; color: var(--accent); font-weight: 700;
+      z-index: 1;
+    }
+    .step:last-child::after { display: none; }
+
+    /* ── CTA BANNER ───────────────────────────────────────── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--ink) 0%, #1a3354 100%);
+      padding: 72px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent, transparent 30px,
+        rgba(245,166,35,.03) 30px, rgba(245,166,35,.03) 60px
+      );
+    }
+    .cta-banner__inner { position: relative; z-index: 1; }
+    .cta-banner h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(32px, 4vw, 52px); font-weight: 800;
+      color: var(--white); margin-bottom: 16px;
+    }
+    .cta-banner p { font-size: 17px; color: rgba(255,255,255,.65); margin-bottom: 36px; }
+    .cta-banner .btn-primary { font-size: 17px; padding: 18px 40px; }
+
+    /* ── INNER PAGES ──────────────────────────────────────── */
+    .page-hero {
+      background: var(--ink);
+      padding: 60px 0 70px;
+      position: relative; overflow: hidden;
+    }
+    .page-hero::after {
+      content: '';
+      position: absolute; bottom: -1px; left: 0; right: 0; height: 50px;
+      background: var(--light);
+      clip-path: polygon(0 100%, 100% 100%, 100% 40%, 0 100%);
+    }
+    .page-hero__eyebrow {
+      font-size: 11px; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+    }
+    .page-hero h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(38px, 5vw, 60px); font-weight: 800;
+      color: var(--white); line-height: 1.05; margin-bottom: 14px;
+    }
+    .page-hero p { font-size: 16px; color: rgba(255,255,255,.65); max-width: 600px; }
+    .inner-section { padding: 70px 0; }
+    .inner-section:nth-child(even) { background: var(--light); }
+
+    /* ── UEBER UNS ────────────────────────────────────────── */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+    .about-img {
+      background: linear-gradient(135deg, var(--card1) 0%, var(--ink) 100%);
+      border-radius: var(--radius);
+      height: 380px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    }
+    .about-img span { font-size: 80px; }
+    .about-img p { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700; color: rgba(255,255,255,.4); }
+    .about-text h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 38px; font-weight: 800; color: var(--ink); margin-bottom: 16px;
+    }
+    .about-text p { font-size: 15px; color: var(--muted); line-height: 1.75; margin-bottom: 16px; }
+    .about-vals {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px;
+    }
+    .about-val {
+      padding: 20px;
+      background: var(--light);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+    }
+    .about-val strong { display: block; color: var(--ink); font-size: 15px; margin-bottom: 4px; }
+    .about-val span { font-size: 13px; color: var(--muted); }
+
+    /* ── DIENSTLEISTUNGEN DETAIL ──────────────────────────── */
+    .service-cards-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;
+    }
+    .service-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+      border-top: 4px solid var(--accent);
+    }
+    .service-card__icon { font-size: 40px; margin-bottom: 16px; }
+    .service-card h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 24px; font-weight: 700; color: var(--ink); margin-bottom: 10px;
+    }
+    .service-card p { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 16px; }
+    .service-card ul { margin-bottom: 20px; }
+    .service-card ul li {
+      font-size: 13px; color: var(--mid); padding: 5px 0;
+      border-bottom: 1px solid var(--light);
+      padding-left: 18px; position: relative;
+    }
+    .service-card ul li::before {
+      content: '›'; position: absolute; left: 0;
+      color: var(--accent); font-weight: 700;
+    }
+
+    /* ── PREISE ───────────────────────────────────────────── */
+    .price-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .price-card {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+      transition: var(--transition);
+    }
+    .price-card:hover { transform: translateY(-4px); }
+    .price-card--featured { border: 2px solid var(--accent); }
+    .price-card__head {
+      background: var(--ink); padding: 32px 28px 24px;
+    }
+    .price-card--featured .price-card__head { background: var(--accent); }
+    .price-card__badge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      background: rgba(245,166,35,.2); color: var(--accent);
+      padding: 4px 10px; border-radius: 4px; margin-bottom: 14px;
+    }
+    .price-card--featured .price-card__badge {
+      background: rgba(13,27,42,.15); color: var(--ink);
+    }
+    .price-card__title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 26px; font-weight: 800; color: var(--white); margin-bottom: 4px;
+    }
+    .price-card--featured .price-card__title { color: var(--ink); }
+    .price-card__price {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 46px; font-weight: 800; color: var(--accent); line-height: 1;
+    }
+    .price-card--featured .price-card__price { color: var(--ink); }
+    .price-card__price span { font-size: 16px; font-weight: 400; }
+    .price-card__body { padding: 28px; }
+    .price-card__list li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: var(--mid);
+      padding: 8px 0; border-bottom: 1px solid var(--light);
+    }
+    .price-card__list li::before {
+      content: '✓'; font-weight: 700; font-size: 12px;
+      color: var(--accent); flex-shrink: 0;
+    }
+    .price-note {
+      background: var(--light); border-radius: var(--radius);
+      padding: 32px; margin-top: 40px;
+      border-left: 4px solid var(--accent);
+    }
+    .price-note h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 700; color: var(--ink); margin-bottom: 10px;
+    }
+    .price-note p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* ── KONTAKT ──────────────────────────────────────────── */
+    .contact-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 48px; }
+    .contact-info h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 34px; font-weight: 800; color: var(--ink); margin-bottom: 24px;
+    }
+    .contact-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 20px 0; border-bottom: 1px solid var(--light);
+    }
+    .contact-item__icon { font-size: 26px; flex-shrink: 0; margin-top: 2px; }
+    .contact-item strong { display: block; color: var(--ink); font-size: 15px; margin-bottom: 4px; }
+    .contact-item span { font-size: 14px; color: var(--muted); }
+    .emergency-box {
+      background: var(--card3);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-top: 24px;
+      border: 1px solid rgba(245,100,50,.2);
+    }
+    .emergency-box__label {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: #ff6b6b; margin-bottom: 8px;
+    }
+    .emergency-box__num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 38px; font-weight: 800; color: var(--white);
+    }
+    .emergency-box__desc { font-size: 13px; color: rgba(255,255,255,.5); margin-top: 6px; }
+    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      border: 1.5px solid #DDE2EA;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; color: var(--mid);
+      background: var(--white);
+      transition: var(--transition);
+      resize: vertical;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none; border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(245,166,35,.12);
+    }
+    .form-submit { align-self: flex-start; }
+    .form-success {
+      display: none;
+      background: #e8f5e9; border: 1px solid #c8e6c9;
+      border-radius: 8px; padding: 20px 24px;
+      color: #2e7d32; font-size: 15px;
+    }
+    .form-success.visible { display: block; }
+
+    /* ── IMPRESSUM / DATENSCHUTZ ──────────────────────────── */
+    .legal-content {
+      max-width: 760px;
+    }
+    .legal-content h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px; font-weight: 700; color: var(--ink); margin: 32px 0 10px;
+    }
+    .legal-content h2:first-child { margin-top: 0; }
+    .legal-content p { font-size: 15px; color: var(--muted); line-height: 1.75; margin-bottom: 12px; }
+
+    /* ── FLOATING CTA ─────────────────────────────────────── */
+    .floating-cta {
+      position: fixed; bottom: 28px; right: 28px; z-index: 90;
+    }
+    .floating-cta .btn-primary {
+      border-radius: 50px;
+      box-shadow: 0 6px 24px rgba(245,166,35,.4);
+      font-size: 14px;
+    }
+    .floating-cta .btn-primary:hover { transform: translateY(-2px); }
+
+    /* ── FOOTER ───────────────────────────────────────────── */
+    .footer {
+      background: var(--ink);
+      color: rgba(255,255,255,.55);
+      padding: 60px 0 28px;
+    }
+    .footer__grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .footer__brand p { font-size: 14px; line-height: 1.7; margin: 14px 0 20px; }
+    .footer__phone {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 24px; font-weight: 700; color: var(--accent);
+    }
+    .footer__heading {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px; font-weight: 700; color: var(--white);
+      letter-spacing: .5px; margin-bottom: 16px;
+    }
+    .footer__links li { margin-bottom: 10px; }
+    .footer__links a {
+      font-size: 14px; transition: var(--transition); cursor: pointer;
+    }
+    .footer__links a:hover { color: var(--accent); }
+    .footer__bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 24px; font-size: 13px;
+    }
+    .footer__bottom-links { display: flex; gap: 24px; }
+    .footer__bottom-links a { cursor: pointer; }
+    .footer__bottom-links a:hover { color: var(--accent); }
+
+    /* ── RESPONSIVE ───────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero__inner { grid-template-columns: 1fr; }
+      .hero__visual { display: none; }
+      .tiles-grid { grid-template-columns: 1fr; }
+      .trust-grid { grid-template-columns: 1fr 1fr; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .step::after { display: none; }
+      .about-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .price-grid { grid-template-columns: 1fr; }
+      .footer__grid { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .nav__links { display: none; }
+      .nav__hamburger { display: flex; }
+    }
+    @media (max-width: 560px) {
+      .trust-grid { grid-template-columns: 1fr; }
+      .footer__grid { grid-template-columns: 1fr; }
+      .about-vals { grid-template-columns: 1fr; }
+      .footer__bottom { flex-direction: column; gap: 12px; text-align: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Hauptnavigation">
+  <div class="container nav__inner">
+    <div class="nav__logo" onclick="showPage('home')">
+      <span class="nav__logo-badge">MB</span>
+      <span class="nav__logo-text">Transport</span>
+    </div>
+    <ul class="nav__links" role="list">
+      <li><a class="nav__link active" onclick="showPage('home')" role="button" tabindex="0">Startseite</a></li>
+      <li><a class="nav__link" onclick="showPage('about')" role="button" tabindex="0">Über uns</a></li>
+      <li><a class="nav__link" onclick="showPage('services')" role="button" tabindex="0">Dienstleistungen</a></li>
+      <li><a class="nav__link" onclick="showPage('prices')" role="button" tabindex="0">Preise</a></li>
+      <li><a class="nav__link" onclick="showPage('contact')" role="button" tabindex="0">Kontakt</a></li>
+      <li><a class="nav__link nav__cta" onclick="showPage('contact')" role="button" tabindex="0">Angebot anfragen</a></li>
+    </ul>
+    <button class="nav__hamburger" aria-label="Menü öffnen" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav__mobile" id="mobileMenu" role="menu">
+    <a class="nav__link" onclick="showPage('home');toggleMenu()" role="menuitem">Startseite</a>
+    <a class="nav__link" onclick="showPage('about');toggleMenu()" role="menuitem">Über uns</a>
+    <a class="nav__link" onclick="showPage('services');toggleMenu()" role="menuitem">Dienstleistungen</a>
+    <a class="nav__link" onclick="showPage('prices');toggleMenu()" role="menuitem">Preise</a>
+    <a class="nav__link" onclick="showPage('contact');toggleMenu()" role="menuitem">Kontakt</a>
+    <a class="nav__link" onclick="showPage('contact');toggleMenu()" role="menuitem" style="color:var(--accent);font-weight:700;">Angebot anfragen →</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: HOME
+══════════════════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+
+  <!-- HERO -->
+  <section class="hero" aria-label="Willkommen">
+    <div class="container hero__inner">
+      <div>
+        <p class="hero__eyebrow">MB Transport – Ihr Partner für alle Transporte</p>
+        <h1 class="hero__headline">Schnell.<br>Zuverlässig.<br><span>Günstig.</span></h1>
+        <p class="hero__sub">Umzüge, Pakettransporte und Abschleppdienst – wir bringen alles sicher ans Ziel. Für Privat- und Geschäftskunden in der Region.</p>
+        <div class="hero__actions">
+          <button class="btn btn-primary" onclick="showPage('contact')">Jetzt Angebot anfragen</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('tiles').scrollIntoView({behavior:'smooth'})">Leistungen entdecken</button>
+        </div>
+        <div class="hero__stats">
+          <div>
+            <div class="hero__stat-num">500+</div>
+            <div class="hero__stat-label">Aufträge pro Jahr</div>
+          </div>
+          <div>
+            <div class="hero__stat-num">24/7</div>
+            <div class="hero__stat-label">Pannenhilfe</div>
+          </div>
+          <div>
+            <div class="hero__stat-num">98%</div>
+            <div class="hero__stat-label">Zufriedene Kunden</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero__visual">
+        <div class="hero__truck-card">
+          <div class="hero__truck-icon">🚛</div>
+          <div class="hero__truck-title">Professioneller Fuhrpark</div>
+          <div class="hero__truck-desc">Moderne Fahrzeuge für jeden Transportbedarf</div>
+        </div>
+        <div class="hero__truck-card">
+          <div class="hero__truck-icon">🛡️</div>
+          <div class="hero__truck-title">Versicherter Transport</div>
+          <div class="hero__truck-desc">Ihre Güter sind bei uns vollumfänglich abgesichert</div>
+        </div>
+        <div class="hero__phone-bar">
+          <div class="hero__phone-icon">📞</div>
+          <div>
+            <div class="hero__phone-label">Notfall & Pannenhilfe</div>
+            <div class="hero__phone-num">+49 177 6786353</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero__road" aria-hidden="true"></div>
+  </section>
+
+  <!-- SERVICE TILES -->
+  <section class="tiles-section" id="tiles" aria-label="Unsere Dienstleistungen">
+    <div class="container">
+      <p class="section-label">Was suchen Sie?</p>
+      <h2 class="section-headline">Direkt zur richtigen<br>Dienstleistung</h2>
+      <p class="section-sub">Wählen Sie Ihren Bereich – wir erstellen Ihnen sofort ein kostenloses Angebot.</p>
+      <div class="tiles-grid">
+
+        <!-- Tile 1: Umzüge -->
+        <article class="tile tile--move" onclick="showPage('move')">
+          <div class="tile__top">
+            <div class="tile__icon" aria-hidden="true">🏠</div>
+            <div class="tile__tag">Privat & Gewerbe</div>
+            <h3 class="tile__title">Umzüge &amp;<br>Möbeltransport</h3>
+            <p class="tile__desc">Vom Einzimmer-Apartment bis zum Firmenumzug – wir packen an und bringen alles sicher ans neue Ziel.</p>
+          </div>
+          <div class="tile__clip" aria-hidden="true"></div>
+          <div class="tile__bottom">
+            <ul class="tile__list" role="list">
+              <li>Privatumzüge</li>
+              <li>Firmenumzüge</li>
+              <li>Möbeltransport &amp; Lieferung</li>
+              <li>Möbelmontage &amp; -demontage</li>
+              <li>Einpackservice auf Wunsch</li>
+            </ul>
+            <button class="tile__btn" onclick="showPage('move');event.stopPropagation()">Umzug anfragen →</button>
+          </div>
+        </article>
+
+        <!-- Tile 2: Pakete -->
+        <article class="tile tile--parcel" onclick="showPage('parcel')">
+          <div class="tile__top">
+            <div class="tile__icon" aria-hidden="true">📦</div>
+            <div class="tile__tag">Express & Standard</div>
+            <h3 class="tile__title">Paket- &amp;<br>Warentransport</h3>
+            <p class="tile__desc">Von der eiligen Kurierfahrt bis zum Transport sperriger Güter – schnell, sicher und termingerecht.</p>
+          </div>
+          <div class="tile__clip" aria-hidden="true"></div>
+          <div class="tile__bottom">
+            <ul class="tile__list" role="list">
+              <li>Pakettransport &amp; Kurierdienst</li>
+              <li>Expresslieferungen</li>
+              <li>Sperrige &amp; schwere Güter</li>
+              <li>Same-Day-Lieferung</li>
+              <li>B2B-Warenlogistik</li>
+            </ul>
+            <button class="tile__btn" onclick="showPage('parcel');event.stopPropagation()">Transportangebot holen →</button>
+          </div>
+        </article>
+
+        <!-- Tile 3: Abschlepp -->
+        <article class="tile tile--tow" onclick="showPage('tow')">
+          <div class="tile__top">
+            <div class="tile__icon" aria-hidden="true">🚨</div>
+            <div class="tile__tag">24/7 Notfalldienst</div>
+            <h3 class="tile__title">Abschleppdienst &amp;<br>Fahrzeugtransport</h3>
+            <p class="tile__desc">Panne auf der Autobahn? Wir sind rund um die Uhr für Sie erreichbar und schnell vor Ort.</p>
+          </div>
+          <div class="tile__clip" aria-hidden="true"></div>
+          <div class="tile__bottom">
+            <ul class="tile__list" role="list">
+              <li>Abschleppen bei Pannen &amp; Unfällen</li>
+              <li>Fahrzeugtransport</li>
+              <li>Autoüberführung</li>
+              <li>Motorradtransport</li>
+              <li>24/7 Notfallbereitschaft</li>
+            </ul>
+            <div style="background:#fff0f0;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+              <span style="font-size:20px;">🆘</span>
+              <div>
+                <div style="font-size:10px;font-weight:700;color:#cc3333;letter-spacing:1px;text-transform:uppercase;">Notfall-Hotline</div>
+                <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:#990000;">+49 177 6786353</div>
+              </div>
+            </div>
+            <button class="tile__btn" onclick="showPage('tow');event.stopPropagation()">Jetzt Hilfe anfordern →</button>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <div class="trust-strip" aria-label="Unsere Stärken">
+    <div class="container">
+      <div class="trust-grid">
+        <div class="trust-item">
+          <div class="trust-item__icon" aria-hidden="true">🕐</div>
+          <div class="trust-item__text">
+            <strong>Pünktlich &amp; zuverlässig</strong>
+            <span>Wir halten Termine ein</span>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-item__icon" aria-hidden="true">💰</div>
+          <div class="trust-item__text">
+            <strong>Faire Preise</strong>
+            <span>Keine versteckten Kosten</span>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-item__icon" aria-hidden="true">🛡️</div>
+          <div class="trust-item__text">
+            <strong>Vollständig versichert</strong>
+            <span>Ihre Güter sind sicher</span>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-item__icon" aria-hidden="true">⭐</div>
+          <div class="trust-item__text">
+            <strong>Top bewertet</strong>
+            <span>Über 200 5-Sterne Rezensionen</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section" aria-label="So funktioniert es">
+    <div class="container">
+      <p class="section-label">Einfacher Ablauf</p>
+      <h2 class="section-headline">In 3 Schritten zum Auftrag</h2>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step__num" aria-hidden="true">1</div>
+          <div class="step__icon" aria-hidden="true">📋</div>
+          <h3 class="step__title">Anfrage senden</h3>
+          <p class="step__desc">Füllen Sie unser kurzes Formular aus oder rufen Sie uns direkt an. Wir melden uns innerhalb von 2 Stunden.</p>
+        </div>
+        <div class="step">
+          <div class="step__num" aria-hidden="true">2</div>
+          <div class="step__icon" aria-hidden="true">💬</div>
+          <h3 class="step__title">Angebot erhalten</h3>
+          <p class="step__desc">Sie bekommen ein transparentes Festpreisangebot – keine versteckten Kosten, keine Überraschungen.</p>
+        </div>
+        <div class="step">
+          <div class="step__num" aria-hidden="true">3</div>
+          <div class="step__icon" aria-hidden="true">✅</div>
+          <h3 class="step__title">Auftrag erledigt</h3>
+          <p class="step__desc">Wir führen den Auftrag professionell und pünktlich aus. Sie lehnen sich zurück.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <div class="cta-banner">
+    <div class="container cta-banner__inner">
+      <h2>Bereit für Ihren nächsten Transport?</h2>
+      <p>Kostenloses Angebot in weniger als 2 Stunden – unverbindlich und transparent.</p>
+      <button class="btn btn-primary" onclick="showPage('contact')">🚀 Jetzt Angebot anfragen</button>
+    </div>
+  </div>
+
+</div><!-- /page-home -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: ÜBER UNS
+══════════════════════════════════════════════════════════ -->
+<div id="page-about" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <p class="page-hero__eyebrow">Wir über uns</p>
+      <h1>Ihr verlässlicher Partner<br>seit über 10 Jahren</h1>
+      <p>MB Transport steht für Professionalität, Zuverlässigkeit und faire Preise – egal ob kleiner Paketversand oder großer Firmenumzug.</p>
+    </div>
+  </div>
+  <section class="inner-section">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-img" aria-hidden="true">
+          <span>🚛</span>
+          <p>MB Transport</p>
+        </div>
+        <div class="about-text">
+          <h2>Wer steckt hinter MB Transport?</h2>
+          <p>MB Transport wurde von Mehmet B. mit dem Ziel gegründet, Transportdienstleistungen anzubieten, die wirklich funktionieren: pünktlich, professionell und zu fairen Preisen.</p>
+          <p>Was als kleines Umzugsunternehmen begann, ist heute ein vielseitiger Transportbetrieb mit eigenem Fuhrpark, erfahrenen Mitarbeitern und einem breiten Leistungsspektrum – von der Kurierfahrt bis zum 24/7-Abschleppdienst.</p>
+          <p>Wir betreuen Privatkunden genauso wie mittelständische Unternehmen und legen bei jedem Auftrag die gleiche Sorgfalt an den Tag.</p>
+          <div class="about-vals">
+            <div class="about-val">
+              <strong>🤝 Verlässlichkeit</strong>
+              <span>Ein Versprechen ist ein Versprechen – bei uns auch.</span>
+            </div>
+            <div class="about-val">
+              <strong>🛡️ Sicherheit</strong>
+              <span>Vollversicherter Transport – Ihre Güter sind in guten Händen.</span>
+            </div>
+            <div class="about-val">
+              <strong>💬 Transparenz</strong>
+              <span>Festpreise ohne böse Überraschungen auf der Rechnung.</span>
+            </div>
+            <div class="about-val">
+              <strong>⚡ Schnelligkeit</strong>
+              <span>Kurzfristige Aufträge möglich – auch Same-Day.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="cta-banner">
+    <div class="container cta-banner__inner">
+      <h2>Überzeugen Sie sich selbst.</h2>
+      <p>Fordern Sie jetzt Ihr kostenloses Angebot an – ohne Verbindlichkeit.</p>
+      <button class="btn btn-primary" onclick="showPage('contact')">Jetzt Angebot anfragen</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: DIENSTLEISTUNGEN
+══════════════════════════════════════════════════════════ -->
+<div id="page-services" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <p class="page-hero__eyebrow">Leistungsübersicht</p>
+      <h1>Alle Dienstleistungen<br>im Überblick</h1>
+      <p>Von Umzügen über Pakettransport bis hin zum Notfall-Abschleppdienst – MB Transport ist Ihr Komplettanbieter.</p>
+    </div>
+  </div>
+  <section class="inner-section">
+    <div class="container">
+      <p class="section-label">Bereich 1</p>
+      <h2 class="section-headline">Umzüge &amp; Möbeltransport</h2>
+      <div class="service-cards-grid" style="margin-top:32px;">
+        <div class="service-card">
+          <div class="service-card__icon">🏠</div>
+          <h3>Privatumzüge</h3>
+          <p>Stressfreier Umzug von A nach B – wir kümmern uns um alles vom Einpacken bis zum Aufstellen.</p>
+          <ul><li>Komplettumzüge inkl. Verpackung</li><li>Möbelmontage &amp; Demontage</li><li>Klaviertransport auf Anfrage</li></ul>
+          <button class="btn btn-primary" style="font-size:13px;padding:10px 20px;" onclick="showPage('move')">Anfrage stellen</button>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🏢</div>
+          <h3>Firmenumzüge</h3>
+          <p>Büro- und Gewerbeumzüge mit minimaler Betriebsunterbrechung – auch am Wochenende.</p>
+          <ul><li>IT-Equipment sicher verpackt</li><li>Aktentransport &amp; Archivumzug</li><li>Planung und Koordination</li></ul>
+          <button class="btn btn-primary" style="font-size:13px;padding:10px 20px;" onclick="showPage('move')">Anfrage stellen</button>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🛋️</div>
+          <h3>Möbeltransport</h3>
+          <p>Einzelne Möbelstücke, Neulieferungen oder Entrümpelung – wir transportieren was Sie brauchen.</p>
+          <ul><li>Einzelmöbel &amp; Sperrgut</li><li>Montage auf Wunsch</li><li>Entsorgung alter Möbel</li></ul>
+          <button class="btn btn-primary" style="font-size:13px;padding:10px 20px;" onclick="showPage('move')">Anfrage stellen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="inner-section">
+    <div class="container">
+      <p class="section-label">Bereich 2</p>
+      <h2 class="section-headline">Paket- &amp; Warentransport</h2>
+      <div class="service-cards-grid" style="margin-top:32px;">
+        <div class="service-card">
+          <div class="service-card__icon">📦</div>
+          <h3>Pakettransport</h3>
+          <p>Zuverlässige Paketlieferungen für Privat- und Geschäftskunden – auch sperriges Gut.</p>
+          <ul><li>Standardpakete &amp; Sperrgut</li><li>Trackingnachweis auf Wunsch</li><li>Regionale &amp; überregionale Lieferung</li></ul>
+          <button class="btn btn-primary" style="font-size:13px;padding:10px 20px;" onclick="showPage('parcel')">Anfrage stellen</button>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">⚡</div>
+          <h3>Kurierfahrten &amp; Express</h3>
+          <p>Dringende Lieferungen die nicht warten können – same-day Zustellung in der Region.</p>
+          <ul><li>Same-Day Delivery</li><li>Direkttransport ohne Umweg</li><li>Kurzfristig buchbar</li></ul>
+          <button class="btn btn-primary" style="font-size:13px;padding:10px 20px;" onclick="showPage('parcel')">Anfrage stellen</button>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🏭</div>
+          <h3>B2B Warenlogistik</h3>
+          <p>Regelmäßige Warentransporte für Unternehmen – flexibel, verlässlich und kalkulierbar.</p>
+          <ul><li>Palettentransport</li><li>Wiederkehrende Touren</li><li>Lager-zu-Lager-Service</li></ul>
+          <button class="btn btn-primary" style="font-size:13px;padding:10px 20px;" onclick="showPage('parcel')">Anfrage stellen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="inner-section">
+    <div class="container">
+      <p class="section-label">Bereich 3</p>
+      <h2 class="section-headline">Abschleppdienst &amp; Fahrzeugtransport</h2>
+      <div class="service-cards-grid" style="margin-top:32px;">
+        <div class="service-card">
+          <div class="service-card__icon">🚨</div>
+          <h3>Pannenhilfe &amp; Abschleppen</h3>
+          <p>24 Stunden, 7 Tage die Woche – wir sind bei jeder Panne schnell für Sie da.</p>
+          <ul><li>Abschleppen nach Panne oder Unfall</li><li>Starthilfe &amp; Schlüsseldienst</li><li>Schnelle Reaktionszeiten</li></ul>
+          <a href="tel:+49 177 6786353" style="display:inline-block;background:#cc3333;color:#fff;font-weight:700;padding:10px 20px;border-radius:8px;font-size:13px;">📞 Jetzt anrufen</a>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🚗</div>
+          <h3>Fahrzeugtransport</h3>
+          <p>Transport von Pkw, Motorrädern und Fahrzeugen aller Art – sicher und termingerecht.</p>
+          <ul><li>Offener &amp; geschlossener Transport</li><li>Oldtimer-Transport</li><li>Motorrad &amp; Quad</li></ul>
+          <button class="btn btn-primary" style="font-size:13px;padding:10px 20px;" onclick="showPage('tow')">Anfrage stellen</button>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🗺️</div>
+          <h3>Autoüberführung</h3>
+          <p>Ihr neues Fahrzeug kommt sicher zu Ihnen – oder wir überführen es dorthin, wo es sein soll.</p>
+          <ul><li>Überführungsfahrten bundesweit</li><li>Neuwagen &amp; Gebrauchtfahrzeuge</li><li>Händler &amp; Privatkunden</li></ul>
+          <button class="btn btn-primary" style="font-size:13px;padding:10px 20px;" onclick="showPage('tow')">Anfrage stellen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="cta-banner">
+    <div class="container cta-banner__inner">
+      <h2>Die richtige Leistung gefunden?</h2>
+      <p>Fordern Sie jetzt Ihr persönliches Angebot an.</p>
+      <button class="btn btn-primary" onclick="showPage('contact')">Jetzt Angebot anfragen</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: PREISE
+══════════════════════════════════════════════════════════ -->
+<div id="page-prices" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <p class="page-hero__eyebrow">Transparente Preise</p>
+      <h1>Faire Festpreise –<br>keine Überraschungen</h1>
+      <p>Alle Preise sind Richtwerte. Nach Ihrer Anfrage erhalten Sie ein individuelles Angebot für Ihren konkreten Auftrag.</p>
+    </div>
+  </div>
+  <section class="inner-section">
+    <div class="container">
+      <p class="section-label">Umzugspreise</p>
+      <h2 class="section-headline">Umzüge &amp; Möbeltransport</h2>
+      <div class="price-grid" style="margin-top:32px;">
+        <div class="price-card">
+          <div class="price-card__head">
+            <div class="price-card__badge">Starter</div>
+            <div class="price-card__title">1–2 Zimmer</div>
+            <div class="price-card__price">ab 299<span> €</span></div>
+          </div>
+          <div class="price-card__body">
+            <ul class="price-card__list">
+              <li>Bis 25 km Umkreis</li>
+              <li>2 Mitarbeiter &amp; 1 Fahrzeug</li>
+              <li>Bis 4 Stunden</li>
+              <li>Grundmöbel inklusive</li>
+            </ul>
+            <button class="tile__btn" style="margin-top:20px;" onclick="showPage('contact')">Angebot anfragen</button>
+          </div>
+        </div>
+        <div class="price-card price-card--featured">
+          <div class="price-card__head">
+            <div class="price-card__badge">Beliebt</div>
+            <div class="price-card__title">3–4 Zimmer</div>
+            <div class="price-card__price">ab 599<span> €</span></div>
+          </div>
+          <div class="price-card__body">
+            <ul class="price-card__list">
+              <li>Bis 50 km Umkreis</li>
+              <li>3 Mitarbeiter &amp; 1 LKW</li>
+              <li>Bis 8 Stunden</li>
+              <li>Möbelmontage &amp; -demontage</li>
+              <li>Schutzdecken inklusive</li>
+            </ul>
+            <button class="tile__btn" style="margin-top:20px;" onclick="showPage('contact')">Angebot anfragen</button>
+          </div>
+        </div>
+        <div class="price-card">
+          <div class="price-card__head">
+            <div class="price-card__badge">Premium</div>
+            <div class="price-card__title">5+ Zimmer / Büro</div>
+            <div class="price-card__price">Auf Anfrage</div>
+          </div>
+          <div class="price-card__body">
+            <ul class="price-card__list">
+              <li>Individuelle Planung</li>
+              <li>Team nach Bedarf</li>
+              <li>Bundesweit möglich</li>
+              <li>Einpackservice buchbar</li>
+              <li>Prioritätstermin</li>
+            </ul>
+            <button class="tile__btn" style="margin-top:20px;" onclick="showPage('contact')">Angebot anfragen</button>
+          </div>
+        </div>
+      </div>
+      <div class="price-note">
+        <h3>💡 Wichtiger Hinweis</h3>
+        <p>Die genannten Preise sind Richtwerte und abhängig von Etage, Entfernung, Menge und weiteren Faktoren. Nach Ihrer Anfrage erstellen wir Ihnen innerhalb von 2 Stunden ein verbindliches Festpreisangebot – kostenlos und unverbindlich.</p>
+      </div>
+    </div>
+  </section>
+  <div class="cta-banner">
+    <div class="container cta-banner__inner">
+      <h2>Individuelles Angebot gewünscht?</h2>
+      <p>Wir erstellen Ihnen in kürzester Zeit ein maßgeschneidertes Angebot.</p>
+      <button class="btn btn-primary" onclick="showPage('contact')">Jetzt Angebot anfragen</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: KONTAKT
+══════════════════════════════════════════════════════════ -->
+<div id="page-contact" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <p class="page-hero__eyebrow">Jetzt Kontakt aufnehmen</p>
+      <h1>Kostenlos anfragen –<br>schnell antworten</h1>
+      <p>Schreiben Sie uns oder rufen Sie direkt an. Wir melden uns innerhalb von 2 Stunden.</p>
+    </div>
+  </div>
+  <section class="inner-section">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h2>Erreichbarkeit</h2>
+          <div class="contact-item">
+            <div class="contact-item__icon">📞</div>
+            <div>
+              <strong>Telefon</strong>
+              <span>+49 177 6786353</span><br>
+              <span>Mo–Sa 7:00 – 20:00 Uhr</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item__icon">✉️</div>
+            <div>
+              <strong>E-Mail</strong>
+              <span>info@mb-service-franken.de</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item__icon">📍</div>
+            <div>
+              <strong>Standort</strong>
+              <span>Holzfeldweg, 36, 96052 Bamberg</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item__icon">🕐</div>
+            <div>
+              <strong>Bürozeiten</strong>
+              <span>Mo–Fr 8:00–18:00 Uhr<br>Sa 9:00–14:00 Uhr</span>
+            </div>
+          </div>
+          <div class="emergency-box">
+            <div class="emergency-box__label">🚨 Notfall &amp; Pannenhilfe – 24/7</div>
+            <div class="emergency-box__num">+49 177 6786353</div>
+            <div class="emergency-box__desc">Rund um die Uhr erreichbar – auch an Sonn- und Feiertagen</div>
+          </div>
+        </div>
+        <div>
+          <div id="formSuccess" class="form-success">
+            ✅ <strong>Ihre Anfrage wurde erfolgreich gesendet!</strong> Wir melden uns innerhalb von 2 Stunden bei Ihnen.
+          </div>
+          <div class="contact-form" id="contactForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="f-name">Vorname *</label>
+                <input type="text" id="f-name" placeholder="Max" required />
+              </div>
+              <div class="form-group">
+                <label for="f-lastname">Nachname *</label>
+                <input type="text" id="f-lastname" placeholder="Mustermann" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="f-phone">Telefon *</label>
+                <input type="tel" id="f-phone" placeholder="+49 …" required />
+              </div>
+              <div class="form-group">
+                <label for="f-email">E-Mail</label>
+                <input type="email" id="f-email" placeholder="mail@beispiel.de" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="f-service">Dienstleistung *</label>
+              <select id="f-service">
+                <option value="">Bitte wählen …</option>
+                <option>Privatumzug</option>
+                <option>Firmenumzug</option>
+                <option>Möbeltransport</option>
+                <option>Pakettransport</option>
+                <option>Kurierfahrt / Express</option>
+                <option>Abschleppdienst</option>
+                <option>Fahrzeugtransport</option>
+                <option>Autoüberführung</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="f-from">Von (PLZ/Ort)</label>
+                <input type="text" id="f-from" placeholder="12345 Berlin" />
+              </div>
+              <div class="form-group">
+                <label for="f-to">Nach (PLZ/Ort)</label>
+                <input type="text" id="f-to" placeholder="80335 München" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="f-date">Wunschtermin</label>
+              <input type="date" id="f-date" />
+            </div>
+            <div class="form-group">
+              <label for="f-msg">Nachricht &amp; Details</label>
+              <textarea id="f-msg" rows="4" placeholder="Beschreiben Sie kurz Ihren Auftrag …"></textarea>
+            </div>
+            <button class="btn btn-primary form-submit" style="font-size:16px;padding:16px 36px;" onclick="submitForm()">🚀 Angebot anfragen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: UMZÜGE (Tile detail)
+══════════════════════════════════════════════════════════ -->
+<div id="page-move" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <p class="page-hero__eyebrow">🏠 Umzüge &amp; Möbeltransport</p>
+      <h1>Stressfrei umziehen –<br>wir kümmern uns um alles</h1>
+      <p>Privatumzüge, Firmenumzüge, Möbellieferung und Montage – kompetent, pünktlich, zum Festpreis.</p>
+    </div>
+  </div>
+  <section class="inner-section">
+    <div class="container">
+      <div class="service-cards-grid">
+        <div class="service-card">
+          <div class="service-card__icon">🏠</div>
+          <h3>Privatumzüge</h3>
+          <p>Von der Wohnung bis zum Einfamilienhaus – wir begleiten Sie von Anfang bis Ende.</p>
+          <ul><li>Einpackservice buchbar</li><li>Möbelmontage inklusive</li><li>Schutz für Böden &amp; Türen</li></ul>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🏢</div>
+          <h3>Firmenumzüge</h3>
+          <p>Büroumzüge mit minimaler Betriebsunterbrechung, auch am Wochenende oder nachts.</p>
+          <ul><li>IT-Equipment sicher verpackt</li><li>Terminplanung auf Ihre Abläufe abgestimmt</li><li>Diskret &amp; professionell</li></ul>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🛋️</div>
+          <h3>Möbeltransport &amp; -montage</h3>
+          <p>Einzelne Möbelstücke liefern, aufbauen oder entsorgen – kein Auftrag zu klein.</p>
+          <ul><li>IKEA &amp; andere Anlieferungen</li><li>Möbelaufbau auf Wunsch</li><li>Entsorgung alter Möbel</li></ul>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:48px;">
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:30px;color:var(--ink);margin-bottom:12px;">Anfrageformular Umzug</h3>
+        <p style="color:var(--muted);margin-bottom:24px;">Schildern Sie uns Ihren Umzug – wir erstellen Ihnen ein Festpreisangebot.</p>
+        <button class="btn btn-primary" style="font-size:16px;padding:16px 40px;" onclick="showPage('contact')">Jetzt Umzug anfragen</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: PAKETE (Tile detail)
+══════════════════════════════════════════════════════════ -->
+<div id="page-parcel" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <p class="page-hero__eyebrow">📦 Paket- &amp; Warentransport</p>
+      <h1>Schnell von A nach B –<br>auch wenn's dringend ist</h1>
+      <p>Pakete, Sperrgut, Expresslieferungen und B2B-Logistik – zuverlässig und termingerecht.</p>
+    </div>
+  </div>
+  <section class="inner-section">
+    <div class="container">
+      <div class="service-cards-grid">
+        <div class="service-card">
+          <div class="service-card__icon">📦</div>
+          <h3>Pakettransport</h3>
+          <p>Standardpakete und Sperrgut sicher und schnell zugestellt – regional wie überregional.</p>
+          <ul><li>Alle Paketgrößen</li><li>Sendungsverfolgung auf Wunsch</li><li>Nachweis bei Übergabe</li></ul>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">⚡</div>
+          <h3>Kurier &amp; Express</h3>
+          <p>Wenn es schnell gehen muss: Same-Day-Zustellung in der Region, kurzfristig buchbar.</p>
+          <ul><li>Direktfahrten ohne Umweg</li><li>Same-Day Delivery</li><li>Persönliche Übergabe</li></ul>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🏭</div>
+          <h3>Waren &amp; sperrige Güter</h3>
+          <p>Paletten, Maschinen, Baustoffe oder sonstige Sonderlasten – wir finden eine Lösung.</p>
+          <ul><li>Palettentransport</li><li>Baustellenlieferung</li><li>Transporte ab Lager</li></ul>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:48px;">
+        <button class="btn btn-primary" style="font-size:16px;padding:16px 40px;" onclick="showPage('contact')">Schnelles Angebot anfordern</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: ABSCHLEPP (Tile detail)
+══════════════════════════════════════════════════════════ -->
+<div id="page-tow" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <p class="page-hero__eyebrow">🚨 Abschleppdienst &amp; Fahrzeugtransport</p>
+      <h1>Panne? Kein Stress –<br>wir sind in 30 Minuten da</h1>
+      <p>24 Stunden erreichbar, schnelle Reaktionszeiten, faire Preise. Rufen Sie uns jetzt an.</p>
+    </div>
+  </div>
+  <section class="inner-section">
+    <div class="container">
+      <div style="background:var(--card3);border-radius:var(--radius);padding:32px;margin-bottom:40px;text-align:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#ff6b6b;margin-bottom:12px;">🚨 NOTFALL-HOTLINE – 24/7</div>
+        <a href="tel:+49 177 6786353" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,6vw,72px);font-weight:800;color:var(--white);display:block;line-height:1;">+49  177 6786353</a>
+        <div style="font-size:14px;color:rgba(255,255,255,.55);margin-top:10px;">Auch an Sonn- und Feiertagen. Schnelle Reaktionszeit garantiert.</div>
+      </div>
+      <div class="service-cards-grid">
+        <div class="service-card">
+          <div class="service-card__icon">🚨</div>
+          <h3>Abschleppen &amp; Pannenhilfe</h3>
+          <p>Panne, Unfall oder Defekt – wir sind rund um die Uhr für Sie da und schnell vor Ort.</p>
+          <ul><li>Abschleppen nach Panne/Unfall</li><li>Starthilfe &amp; Reifenwechsel</li><li>Schlüsseldienst im Fahrzeug</li></ul>
+          <a href="tel:+49 177 6786353" style="display:inline-block;background:#cc3333;color:#fff;font-weight:700;padding:10px 20px;border-radius:8px;font-size:13px;margin-top:8px;">📞 Sofort anrufen</a>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🚗</div>
+          <h3>Fahrzeugtransport</h3>
+          <p>Sicherer Transport Ihres Fahrzeugs zum Wunschort – offen oder geschlossen.</p>
+          <ul><li>Pkw, Motorrad, Quad</li><li>Oldtimer &amp; Fahrzeuge ohne TÜV</li><li>Händler &amp; Privatverkäufer</li></ul>
+          <button class="btn btn-primary" style="font-size:13px;padding:10px 20px;margin-top:8px;" onclick="showPage('contact')">Anfrage stellen</button>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">🗺️</div>
+          <h3>Autoüberführung</h3>
+          <p>Wir überführen Ihr Fahrzeug sicher ans Ziel – bundesweit, termingerecht, versichert.</p>
+          <ul><li>Neuwagen &amp; Gebrauchtwagen</li><li>Überführungsfahrten</li><li>Händler &amp; Privatkunden</li></ul>
+          <button class="btn btn-primary" style="font-size:13px;padding:10px 20px;margin-top:8px;" onclick="showPage('contact')">Anfrage stellen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: IMPRESSUM
+══════════════════════════════════════════════════════════ -->
+<div id="page-impressum" class="page">
+  <div class="page-hero"><div class="container"><p class="page-hero__eyebrow">Rechtliches</p><h1>Impressum</h1></div></div>
+  <section class="inner-section"><div class="container"><div class="legal-content">
+    <h2>Angaben gemäß § 5 TMG</h2>
+    <p>MB Transport<br>Holzfeldweg 36<br>96052 Bamberg</p>
+    <h2>Vertreten durch</h2>
+    <p>M. Jourieh</p>
+    <h2>Kontakt</h2>
+    <p>Telefon: +49 177 6786353<br>E-Mail: info@mb-service-franken.de.de</p>
+    <h2>Umsatzsteuer-ID</h2>
+    <p>Umsatzsteuer-Identifikationsnummer gemäß §27 a Umsatzsteuergesetz: DE454596257</p>
+    <h2>Gewerberegister</h2>
+    
+    <h2>Haftungsausschluss</h2>
+    <p>Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.</p>
+  </div></div></section>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: DATENSCHUTZ
+══════════════════════════════════════════════════════════ -->
+<div id="page-datenschutz" class="page">
+  <div class="page-hero"><div class="container"><p class="page-hero__eyebrow">Rechtliches</p><h1>Datenschutzerklärung</h1></div></div>
+  <section class="inner-section"><div class="container"><div class="legal-content">
+    <h2>1. Datenschutz auf einen Blick</h2>
+    <p>Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen.</p>
+    <h2>2. Datenerfassung auf dieser Website</h2>
+    <p>Wir erheben Daten, die Sie uns aktiv mitteilen, zum Beispiel über unser Kontaktformular. Diese Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet und nicht an Dritte weitergegeben.</p>
+    <h2>3. Kontaktformular</h2>
+    <p>Wenn Sie uns per Kontaktformular Anfragen zukommen lassen, werden Ihre Angaben aus dem Anfrageformular inklusive der von Ihnen dort angegebenen Kontaktdaten zwecks Bearbeitung der Anfrage und für den Fall von Anschlussfragen bei uns gespeichert. Diese Daten geben wir nicht ohne Ihre Einwilligung weiter.</p>
+    <h2>4. Ihre Rechte</h2>
+    <p>Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer gespeicherten Daten sowie das Recht auf Datenübertragbarkeit. Wenden Sie sich dafür jederzeit an: info@mb-transport.de</p>
+    <h2>5. Verantwortliche Stelle</h2>
+    <p>MB Transport, Holzfeldweg, 36 96052 Bamberg<br>Telefon: +49  177 6786353<br>E-Mail: info@mb-service-Bamberg.de</p>
+  </div></div></section>
+</div>
+
+
+<!-- FLOATING CTA -->
+<div class="floating-cta" aria-label="Angebot anfragen">
+  <button class="btn btn-primary" onclick="showPage('contact')">✉️ Angebot anfragen</button>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <div class="nav__logo" style="cursor:pointer;" onclick="showPage('home')">
+          <span class="nav__logo-badge">MB</span>
+          <span class="nav__logo-text">Transport</span>
+        </div>
+        <p>Ihr zuverlässiger Partner für Umzüge, Pakettransporte und Pannenhilfe. Schnell, sicher, fair.</p>
+        <div class="footer__phone">+49 177 6786353</div>
+      </div>
+      <div>
+        <div class="footer__heading">Navigation</div>
+        <ul class="footer__links" role="list">
+          <li><a onclick="showPage('home')">Startseite</a></li>
+          <li><a onclick="showPage('about')">Über uns</a></li>
+          <li><a onclick="showPage('services')">Dienstleistungen</a></li>
+          <li><a onclick="showPage('prices')">Preise</a></li>
+          <li><a onclick="showPage('contact')">Kontakt</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__heading">Leistungen</div>
+        <ul class="footer__links" role="list">
+          <li><a onclick="showPage('move')">Umzüge</a></li>
+          <li><a onclick="showPage('parcel')">Pakettransport</a></li>
+          <li><a onclick="showPage('tow')">Abschleppdienst</a></li>
+          <li><a onclick="showPage('move')">Möbelmontage</a></li>
+          <li><a onclick="showPage('tow')">Autoüberführung</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__heading">Kontakt</div>
+        <ul class="footer__links" role="list">
+          <li><span>📞 +49  177 6786353</span></li>
+          <li><span>✉️ info@mb-service-franken.de</span></li>
+          <li><span>📍 Holzfeldweg 36</span></li>
+          <li><span>🕐 Mo–Fr 7–20 Uhr</span></li>
+          <li><span>🚨 Notfall: 24/7</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2024 MB Transport. Alle Rechte vorbehalten.</span>
+      <div class="footer__bottom-links">
+        <a onclick="showPage('impressum')">Impressum</a>
+        <a onclick="showPage('datenschutz')">Datenschutz</a>
+        <a onclick="showPage('contact')">Kontakt</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── Page Router ────────────────────────────────────────────
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + id);
+    if (target) {
+      target.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    // update nav active state
+    document.querySelectorAll('.nav__link').forEach(l => l.classList.remove('active'));
+    const map = { home: 0, about: 1, services: 2, prices: 3, contact: 4 };
+    const links = document.querySelectorAll('.nav__links .nav__link');
+    if (map[id] !== undefined) links[map[id]]?.classList.add('active');
+  }
+
+  // ── Mobile Menu ────────────────────────────────────────────
+  function toggleMenu() {
+    const m = document.getElementById('mobileMenu');
+    m.classList.toggle('open');
+  }
+
+  // ── Form Submit (demo) ─────────────────────────────────────
+  function submitForm() {
+    const form = document.getElementById('contactForm');
+    const success = document.getElementById('formSuccess');
+    form.style.display = 'none';
+    success.classList.add('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── Keyboard nav support ───────────────────────────────────
+  document.querySelectorAll('[role="button"]').forEach(el => {
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') el.click();
+    });
+  });
+</script>
+</body>
+</html>
